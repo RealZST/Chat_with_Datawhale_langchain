@@ -33,12 +33,12 @@ LLM_MODEL_LIST = sum(list(LLM_MODEL_DICT.values()),[])
 INIT_LLM = "chatglm_std"
 EMBEDDING_MODEL_LIST = ['zhipuai', 'openai', 'm3e']
 INIT_EMBEDDING_MODEL = "m3e"
-DEFAULT_DB_PATH = "./knowledge_db"
-DEFAULT_PERSIST_PATH = "./vector_db/chroma"
-AIGC_AVATAR_PATH = "./figures/aigc_avatar.png"
-DATAWHALE_AVATAR_PATH = "./figures/datawhale_avatar.png"
-AIGC_LOGO_PATH = "./figures/aigc_logo.png"
-DATAWHALE_LOGO_PATH = "./figures/datawhale_logo.png"
+DEFAULT_DB_PATH = "../knowledge_db"
+DEFAULT_PERSIST_PATH = "../vector_db/chroma"
+AIGC_AVATAR_PATH = "../figures/aigc_avatar.png"
+DATAWHALE_AVATAR_PATH = "../figures/datawhale_avatar.png"
+AIGC_LOGO_PATH = "../figures/aigc_logo.png"
+DATAWHALE_LOGO_PATH = "../figures/datawhale_logo.png"
 
 def get_model_by_platform(platform):
     return LLM_MODEL_DICT.get(platform, "")

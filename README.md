@@ -38,3 +38,7 @@ module load gcc
 ```
 
 此时再安装依赖项不会再报错。
+
+cd serve
+
+uvicorn api:app --reload
