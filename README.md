@@ -12,7 +12,7 @@ conda activate llm-universe
 
 **2️⃣ Modify package versions in `requirements.txt`**
 
-Update the following package versions in `requirements.txt`([reference](https://zhuanlan.zhihu.com/p/694891334)):
+Update the following package versions in `requirements.txt` ([reference](https://zhuanlan.zhihu.com/p/694891334)):
 ```
 langchain
 langsmith==0.1.0
