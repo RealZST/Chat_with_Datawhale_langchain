@@ -1,16 +1,18 @@
-# 个人知识库助手项目（复现）
+# Personal Knowledge Base Assistant (Reproduction)
 
-## 环境配置
+## **Environment Setup**
 
-环境：Triton
+**1️⃣ Create and activate the Conda environment**
 
-创建及激活 Conda 环境
-```shell
+```bash
 conda create -n llm-universe python==3.9.0
 conda activate llm-universe
 ```
 
-对requirements.txt中的packages版本修改如下：
+
+**2️⃣ Modify package versions in `requirements.txt`**
+
+Update the following package versions in `requirements.txt`:
 ```
 langchain
 langsmith==0.1.0
@@ -18,27 +20,67 @@ langchain-community==0.0.31
 packaging
 ```
 
-安装依赖项
-```shell
+
+
+**3️⃣ Install dependencies**
+
+```bash
 pip install -r requirements.txt
 ```
 
-若报错：
+If you encounter the following error:
 ```
 RuntimeError: Unsupported compiler -- at least C++11 support is needed!
 ```
-说明没有安装 C++ 编译器（`g++`）或版本太低，可以运行下面指令验证：
+It indicates that the C++ compiler (`g++`) is either missing or outdated. You can verify this by running:
 ```bash
 g++ --version
 ```
 
-对于受限的 HPC 环境（不允许安装 `g++`），可以切换到具有 `g++` 的环境：
+For restricted HPC environments(like Triton) where `g++` installation is not allowed, you can switch to an environment that includes `g++` by using:
 ```bash
 module load gcc
 ```
 
-此时再安装依赖项不会再报错。
+Then reinstall dependencies.
 
+
+---
+
+## **Getting Started**
+
+**1️⃣ Navigate to the `serve` directory**
+
+```bash
 cd serve
+```
 
+
+**2️⃣ Start the FastAPI server**
+
+```bash
 uvicorn api:app --reload
+```
+
+
+**3️⃣ Activate the environment in a new terminal**
+
+```bash
+conda activate llm-universe
+cd Chat_with_Datawhale_langchain/serve
+```
+
+
+**4️⃣ Add your API Key to `.env`**
+
+Make sure to add your API Key inside the `.env` file before proceeding.
+
+
+**5️⃣ Run the Gradio frontend**
+```bash
+python run_gradio.py -model_name='gpt-3.5-turbo' -embedding_model='openai' -db_path='../knowledge_db' -persist_path='../vector_db'
+```
+
+- Loads the 'gpt-3.5-turbo' model with 'openai' as the embedding model.
+- Uses `../knowledge_db` as the knowledge base path.
+- Stores vector data in `../vector_db`.
