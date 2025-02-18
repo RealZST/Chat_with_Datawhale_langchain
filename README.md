@@ -37,7 +37,7 @@ It indicates that the C++ compiler (`g++`) is either missing or outdated. You ca
 g++ --version
 ```
 
-For restricted HPC environments(like Triton) where `g++` installation is not allowed, you can switch to an environment that includes `g++` by using:
+For restricted HPC environments (like Triton) where `g++` installation is not allowed, you can switch to an environment that includes `g++` by using:
 ```bash
 module load gcc
 ```
