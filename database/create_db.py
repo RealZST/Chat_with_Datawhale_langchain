@@ -1,3 +1,7 @@
+'''
+Used for index construction (Document loading → Splitting → Vectorization → Storing in database)
+'''
+
 import os
 import sys
 import re
@@ -10,21 +14,24 @@ from langchain.document_loaders import UnstructuredMarkdownLoader
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain.document_loaders import PyMuPDFLoader
 from langchain.vectorstores import Chroma
-# 首先实现基本配置
-
-DEFAULT_DB_PATH = "./knowledge_db"
-DEFAULT_PERSIST_PATH = "./vector_db"
 
 
-def get_files(dir_path):
-    file_list = []
-    for filepath, dirnames, filenames in os.walk(dir_path):
-        for filename in filenames:
-            file_list.append(os.path.join(filepath, filename))
-    return file_list
+DEFAULT_DB_PATH = "../knowledge_db"
+DEFAULT_PERSIST_PATH = "../vector_db/chroma"
+
+
+# def get_files(dir_path):
+#     file_list = []
+#     for filepath, dirnames, filenames in os.walk(dir_path):
+#         for filename in filenames:
+#             file_list.append(os.path.join(filepath, filename))
+#     return file_list
 
 
 def file_loader(file, loaders):
+    '''
+    Document loading
+    '''
     if isinstance(file, tempfile._TemporaryFileWrapper):
         file = file.name
     if not os.path.isfile(file):
@@ -51,65 +58,62 @@ def create_db_info(files=DEFAULT_DB_PATH, embeddings="openai", persist_directory
 
 def create_db(files=DEFAULT_DB_PATH, persist_directory=DEFAULT_PERSIST_PATH, embeddings="openai"):
     """
-    该函数用于加载 PDF 文件，切分文档，生成文档的嵌入向量，创建向量数据库。
+    This function loads files, splits documents, generates document embeddings, 
+    and creates a vector database.
+   
+    Args:
+        files: Path to the stored files.
+        embeddings: Embedding model used for vectorization.
 
-    参数:
-    file: 存放文件的路径。
-    embeddings: 用于生产 Embedding 的模型
-
-    返回:
-    vectordb: 创建的数据库。
+    Return:
+        vectordb: The created vector database.
     """
     if files == None:
         return "can't load empty file"
     if type(files) != list:
         files = [files]
+    
+    # Load documents
     loaders = []
     [file_loader(file, loaders) for file in files]
     docs = []
     for loader in loaders:
         if loader is not None:
             docs.extend(loader.load())
-    # 切分文档
-    text_splitter = RecursiveCharacterTextSplitter(
-        chunk_size=500, chunk_overlap=150)
+    
+    # Split documents into smaller chunks
+    text_splitter = RecursiveCharacterTextSplitter(chunk_size=500, chunk_overlap=150)
     split_docs = text_splitter.split_documents(docs)
+    
+    # Select the embedding model
     if type(embeddings) == str:
         embeddings = get_embedding(embedding=embeddings)
-    # 定义持久化路径
-    persist_directory = './vector_db/chroma'
-    # 加载数据库
+    
+    # Create a vector database and store vectors
     vectordb = Chroma.from_documents(
-    documents=split_docs,
-    embedding=embeddings,
-    persist_directory=persist_directory  # 允许我们将persist_directory目录保存到磁盘上
+        documents=split_docs,
+        embedding=embeddings,
+        persist_directory=persist_directory
     ) 
 
+    # Persist the vector database to ensure it remains available after a restart 
+    # without needing to be rebuilt, suitable for ChromaDB.
     vectordb.persist()
+    
     return vectordb
-
-
-def presit_knowledge_db(vectordb):
-    """
-    该函数用于持久化向量数据库。
-
-    参数:
-    vectordb: 要持久化的向量数据库。
-    """
-    vectordb.persist()
-
 
 def load_knowledge_db(path, embeddings):
     """
-    该函数用于加载向量数据库。
+    This function loads an existing vector database.
 
-    参数:
-    path: 要加载的向量数据库路径。
-    embeddings: 向量数据库使用的 embedding 模型。
+    Args:
+        path: Path to the vector database.
+        embeddings: The embedding model used by the vector database.
 
-    返回:
-    vectordb: 加载的数据库。
+    Return:
+        vectordb: The loaded vector database.
     """
+    # Load an existing vector database
     vectordb = Chroma(
         persist_directory=path,
         embedding_function=embeddings
@@ -118,4 +122,4 @@ def load_knowledge_db(path, embeddings):
 
 
 if __name__ == "__main__":
-    create_db(embeddings="m3e")
+    create_db(embeddings="openai")
