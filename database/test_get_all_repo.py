@@ -1,5 +1,5 @@
 '''
-Retrieve all open-source project README files from the Datawhale organization repository.
+Collect all open-source project README files from the Datawhale organization repository.
 '''
 
 import json
@@ -33,7 +33,7 @@ def get_repos(org_name, token, export_dir):
         loguru.logger.error(response.text)
         return []
 
-# Retrieve README files from a repository
+# Fetch README files from a repository
 def fetch_repo_readme(org_name, repo_name, token, export_dir):
     headers = {
         'Authorization': f'token {token}',
@@ -61,7 +61,7 @@ if __name__ == '__main__':
     org_name = 'datawhalechina'
     # Set export_dir
     export_dir = "database/readme_db"  # Replace with the actual directory path
-    # Retrieve the list of repositories
+    # Fetch the list of repositories
     repos = get_repos(org_name, TOKEN, export_dir)
     # Print repository names and fetch each repository's README
     if repos:

@@ -1,5 +1,5 @@
 '''
-After running `test_get_all_repo.py`, it retrieves all open-source project README files from the Datawhale organization repository.
+After running `test_get_all_repo.py`, it collects all open-source project README files from the Datawhale organization repository.
 But these README files contain a lot of irrelevant information.
 Running this script can generate a summary for each README 
 and save it to `../knowledge_db/readme_summary`, which serves as part of the knowledge base.
@@ -62,7 +62,7 @@ def generate_llm_summary(repo_name, readme_content,model):
     return response.choices[0].message["content"]
 
 def main(org_name,export_dir,summary_dir,model):
-    # Retrieve the list of repositories
+    # Fetch the list of repositories
     repos = get_repos(org_name, TOKEN, export_dir)
 
     # Create a directory to save summaries
