@@ -18,6 +18,7 @@ langchain
 langsmith==0.1.0
 langchain-community==0.0.31
 packaging
+tiktoken
 ```
 
 
@@ -48,38 +49,20 @@ Then reinstall dependencies.
 
 ## **Getting Started**
 
-**1️⃣ Navigate to the `serve` directory**
-
-```bash
-cd serve
-```
-
-
-**2️⃣ Start the FastAPI server**
-
-```bash
-uvicorn api:app --reload
-```
-
-
-**3️⃣ Activate the environment in a new terminal**
+**1️⃣ Activate the environment and navigate to the `serve` directory**
 
 ```bash
 conda activate llm-universe
 cd Chat_with_Datawhale_langchain/serve
 ```
 
+**2️⃣ Add your API Key to `.env`**
 
-**4️⃣ Add your API Key to `.env`**
-
-Make sure to add your API Key inside the `.env` file before proceeding.
+Make sure to add your API Key inside the `.env` file before running.
 
 
-**5️⃣ Run the Gradio frontend**
+**3️⃣ Run the Gradio frontend**
+
 ```bash
-python run_gradio.py -model_name='gpt-3.5-turbo' -embedding_model='openai' -db_path='../knowledge_db' -persist_path='../vector_db'
+python run_gradio.py
 ```
-
-- Loads the 'gpt-3.5-turbo' model with 'openai' as the embedding model.
-- Uses `../knowledge_db` as the knowledge base path.
-- Stores vector data in `../vector_db`.
