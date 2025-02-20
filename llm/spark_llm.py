@@ -10,6 +10,12 @@
 @Desc    :   基于讯飞星火大模型自定义 LLM 类
 '''
 
+'''
+Inherits the Self_LLM class in self_llm.py and wraps the Spark API, 
+making it convenient for model_to_llm.py to call this LLM.
+'''
+
+
 from langchain.llms.base import LLM
 from typing import Any, List, Mapping, Optional, Dict, Union, Tuple
 from pydantic import Field

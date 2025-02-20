@@ -19,6 +19,7 @@ langsmith==0.1.0
 langchain-community==0.0.31
 packaging
 tiktoken
+sentence-transformers
 ```
 
 

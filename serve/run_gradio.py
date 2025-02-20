@@ -38,7 +38,7 @@ LLM_MODEL_LIST = sum(list(LLM_MODEL_DICT.values()),[])
 # Default model settings
 INIT_LLM = "gpt-3.5-turbo"
 EMBEDDING_MODEL_LIST = ['zhipuai', 'openai', 'm3e']
-INIT_EMBEDDING_MODEL = "openai"
+INIT_EMBEDDING_MODEL = "m3e"
 DEFAULT_DB_PATH = "../knowledge_db"
 DEFAULT_PERSIST_PATH = "../vector_db/chroma"
 
@@ -60,7 +60,7 @@ class Model_center():
         self.chat_qa_chain_self = {}
         self.qa_chain_self = {}
 
-    def chat_qa_chain_self_answer(self, question: str, chat_history: list = [], model: str = "openai", embedding: str = "openai", 
+    def chat_qa_chain_self_answer(self, question: str, chat_history: list = [], model: str = "openai", embedding: str = "m3e", 
                                     temperature: float = 0.0, top_k: int = 4, history_len: int = 3, file_path: str = DEFAULT_DB_PATH, 
                                     persist_path: str = DEFAULT_PERSIST_PATH):
         """
@@ -80,7 +80,7 @@ class Model_center():
         except Exception as e:
             return e, chat_history
 
-    def qa_chain_self_answer(self, question: str, chat_history: list = [], model: str = "openai", embedding="openai", 
+    def qa_chain_self_answer(self, question: str, chat_history: list = [], model: str = "openai", embedding="m3e", 
                                 temperature: float = 0.0, top_k: int = 4, file_path: str = DEFAULT_DB_PATH, 
                                 persist_path: str = DEFAULT_PERSIST_PATH):
         """
@@ -194,8 +194,8 @@ with block as demo:
 
             with gr.Row():
                 # Create submission buttons
-                db_with_his_btn = gr.Button("Chat db with history")
-                db_wo_his_btn = gr.Button("Chat db without history")
+                db_with_his_btn = gr.Button("Chat db with history (RAG)")
+                db_wo_his_btn = gr.Button("Chat db without history (RAG)")
                 llm_btn = gr.Button("Chat with llm")
             
             with gr.Row():

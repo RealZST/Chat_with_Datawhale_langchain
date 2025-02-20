@@ -10,9 +10,15 @@
 @Desc    :   将各个大模型的原生接口封装在一个接口
 '''
 
+'''
+Unifies API call interface for different LLM platforms.
+When 'Chat with LLM' is clicked or the Enter is pressed, the selected LLM is invoked 
+through the `get_completion` function in this script to generate responses.
+'''
+
 import openai
 import json
-import requests
+import requests  # Import requests to call RESTful APIs (for Wenxin)
 import _thread as thread
 import base64
 import datetime
@@ -30,20 +36,23 @@ from wsgiref.handlers import format_date_time
 import zhipuai
 from langchain.utils import get_from_dict_or_env
 
-import websocket  # 使用websocket_client
+import websocket  # Import websocket to support WebSocket connections (for Spark)
+
 
 def get_completion(prompt :str, model :str, temperature=0.1,api_key=None, secret_key=None, access_token=None, appid=None, api_secret=None, max_tokens=2048):
-    # 调用大模型获取回复，支持上述三种模型+gpt
-    # arguments:
-    # prompt: 输入提示
-    # model：模型名
-    # temperature: 温度系数
-    # api_key：如名
-    # secret_key, access_token：调用文心系列模型需要
-    # appid, api_secret: 调用星火系列模型需要
-    # max_tokens : 返回最长序列
-    # return: 模型返回，字符串
-    # 调用 GPT
+    '''
+    Selects the LLM based on the 'model' parameter and generate th response.
+
+    Args:
+        prompt: Input prompt
+        model: Model name
+        secret_key, access_token: Required for Wenxin models
+        appid, api_secret: Required for Spark models
+        max_tokens: Maximum sequence length to return
+
+    Return:
+        Generated response from the model (str)
+    '''
     if model in ["gpt-3.5-turbo", "gpt-3.5-turbo-16k-0613", "gpt-3.5-turbo-0613", "gpt-4", "gpt-4-32k"]:
         return get_completion_gpt(prompt, model, temperature, api_key, max_tokens)
     elif model in ["ERNIE-Bot", "ERNIE-Bot-4", "ERNIE-Bot-turbo"]:
@@ -53,49 +62,44 @@ def get_completion(prompt :str, model :str, temperature=0.1,api_key=None, secret
     elif model in ["chatglm_pro", "chatglm_std", "chatglm_lite"]:
         return get_completion_glm(prompt, model, temperature, api_key, max_tokens)
     else:
-        return "不正确的模型"
+        return "Invalid model"
     
 def get_completion_gpt(prompt : str, model : str, temperature : float, api_key:str, max_tokens:int):
-    # 封装 OpenAI 原生接口
+    # Creates a wrapper for OpenAI's GPT API
     if api_key == None:
         api_key = parse_llm_api_key("openai")
     openai.api_key = api_key
-    # 具体调用
     messages = [{"role": "user", "content": prompt}]
+    # Call OpenAI API
     response = openai.ChatCompletion.create(
         model=model,
         messages=messages,
-        temperature=temperature, # 模型输出的温度系数，控制输出的随机程度
-        max_tokens = max_tokens, # 回复最大长度
+        temperature=temperature,
+        max_tokens = max_tokens,
     )
-    # 调用 OpenAI 的 ChatCompletion 接口
+
     return response.choices[0].message["content"]
 
 def get_access_token(api_key, secret_key):
     """
-    使用 API Key，Secret Key 获取access_token，替换下列示例中的应用API Key、应用Secret Key
+    Retrieves the access_token using API Key and Secret Key.
     """
-    # 指定网址
     url = f"https://aip.baidubce.com/oauth/2.0/token?grant_type=client_credentials&client_id={api_key}&client_secret={secret_key}"
-    # 设置 POST 访问
     payload = json.dumps("")
     headers = {
         'Content-Type': 'application/json',
         'Accept': 'application/json'
     }
-    # 通过 POST 访问获取账户对应的 access_token
     response = requests.request("POST", url, headers=headers, data=payload)
+    
     return response.json().get("access_token")
 
 def get_completion_wenxin(prompt : str, model : str, temperature : float, api_key:str, secret_key : str):
-    # 封装百度文心原生接口
+    # Creates a wrapper for Wenxin API
     if api_key == None or secret_key == None:
         api_key, secret_key = parse_llm_api_key("wenxin")
-    # 获取access_token
     access_token = get_access_token(api_key, secret_key)
-    # 调用接口
     url = f"https://aip.baidubce.com/rpc/2.0/ai_custom/v1/wenxinworkshop/chat/eb-instant?access_token={access_token}"
-    # 配置 POST 参数
     payload = json.dumps({
         "messages": [
             {
@@ -107,30 +111,29 @@ def get_completion_wenxin(prompt : str, model : str, temperature : float, api_ke
     headers = {
         'Content-Type': 'application/json'
     }
-    # 发起请求
     response = requests.request("POST", url, headers=headers, data=payload)
-    # 返回的是一个 Json 字符串
     js = json.loads(response.text)
+
     return js["result"]
 
 def get_completion_spark(prompt : str, model : str, temperature : float, api_key:str, appid : str, api_secret : str, max_tokens : int):
+    # Creates a wrapper for Spark API
     if api_key == None or appid == None and api_secret == None:
         api_key, appid, api_secret = parse_llm_api_key("spark")
     
-    # 配置 1.5 和 2 的不同环境
     if model == "Spark-1.5":
         domain = "general"  
-        Spark_url = "ws://spark-api.xf-yun.com/v1.1/chat"  # v1.5环境的地址
+        Spark_url = "ws://spark-api.xf-yun.com/v1.1/chat" 
     else:
-        domain = "generalv2"    # v2.0版本
-        Spark_url = "ws://spark-api.xf-yun.com/v2.1/chat"  # v2.0环境的地址
+        domain = "generalv2" 
+        Spark_url = "ws://spark-api.xf-yun.com/v2.1/chat"
 
     question = [{"role":"user", "content":prompt}]
     response = spark_main(appid,api_key,api_secret,Spark_url,domain,question,temperature, max_tokens)
     return response
 
 def get_completion_glm(prompt : str, model : str, temperature : float, api_key:str, max_tokens : int):
-    # 获取GLM回答
+    # Creates a wrapper for Zhipuai API
     if api_key == None:
         api_key = parse_llm_api_key("zhipuai")
     zhipuai.api_key = api_key
@@ -141,17 +144,11 @@ def get_completion_glm(prompt : str, model : str, temperature : float, api_key:s
         temperature = temperature,
         max_tokens=max_tokens
         )
+
     return response["data"]["choices"][0]["content"].strip('"').strip(" ")
 
-# def getText(role, content, text = []):
-#     # role 是指定角色，content 是 prompt 内容
-#     jsoncon = {}
-#     jsoncon["role"] = role
-#     jsoncon["content"] = content
-#     text.append(jsoncon)
-#     return text
 
-# 星火 API 调用使用
+# WebSocket-based API for Spark
 answer = ""
 
 class Ws_Param(object):
@@ -199,26 +196,21 @@ class Ws_Param(object):
         # 此处打印出建立连接时候的url,参考本demo的时候可取消上方打印的注释，比对相同参数时生成的url与自己代码生成的url是否一致
         return url
 
-
 # 收到websocket错误的处理
 def on_error(ws, error):
     print("### error:", error)
-
 
 # 收到websocket关闭的处理
 def on_close(ws,one,two):
     print(" ")
 
-
 # 收到websocket连接建立的处理
 def on_open(ws):
     thread.start_new_thread(run, (ws,))
 
-
 def run(ws, *args):
     data = json.dumps(gen_params(appid=ws.appid, domain= ws.domain,question=ws.question, temperature = ws.temperature, max_tokens = ws.max_tokens))
     ws.send(data)
-
 
 # 收到websocket消息的处理
 def on_message(ws, message):
@@ -239,11 +231,7 @@ def on_message(ws, message):
         if status == 2:
             ws.close()
 
-
 def gen_params(appid, domain,question, temperature, max_tokens):
-    """
-    通过appid和用户的提问来生成请参数
-    """
     data = {
         "header": {
             "app_id": appid,
@@ -266,9 +254,7 @@ def gen_params(appid, domain,question, temperature, max_tokens):
     }
     return data
 
-
 def spark_main(appid, api_key, api_secret, Spark_url,domain, question, temperature, max_tokens):
-    # print("星火:")
     output_queue = queue.Queue()
     def on_message(ws, message):
         data = json.loads(message)
@@ -280,8 +266,6 @@ def spark_main(appid, api_key, api_secret, Spark_url,domain, question, temperatu
             choices = data["payload"]["choices"]
             status = choices["status"]
             content = choices["text"][0]["content"]
-            # print(content, end='')
-            # 将输出值放入队列
             output_queue.put(content)
             if status == 2:
                 ws.close()
@@ -298,13 +282,15 @@ def spark_main(appid, api_key, api_secret, Spark_url,domain, question, temperatu
     ws.run_forever(sslopt={"cert_reqs": ssl.CERT_NONE})
     return ''.join([output_queue.get() for _ in range(output_queue.qsize())])
 
+
 def parse_llm_api_key(model:str, env_file:dict()=None):
     """
-    通过 model 和 env_file 的来解析平台参数
+    Parses API keys based on the model name 
     """   
     if env_file == None:
         _ = load_dotenv(find_dotenv())
         env_file = os.environ
+    
     if model == "openai":
         return env_file["OPENAI_API_KEY"]
     elif model == "wenxin":
@@ -313,6 +299,5 @@ def parse_llm_api_key(model:str, env_file:dict()=None):
         return env_file["spark_api_key"], env_file["spark_appid"], env_file["spark_api_secret"]
     elif model == "zhipuai":
         return get_from_dict_or_env(env_file, "zhipuai_api_key", "ZHIPUAI_API_KEY")
-        # return env_file["ZHIPUAI_API_KEY"]
     else:
         raise ValueError(f"model{model} not support!!!")

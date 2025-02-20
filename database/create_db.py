@@ -50,13 +50,13 @@ def file_loader(file, loaders):
     return
 
 
-def create_db_info(files=DEFAULT_DB_PATH, embeddings="openai", persist_directory=DEFAULT_PERSIST_PATH):
+def create_db_info(files=DEFAULT_DB_PATH, embeddings="m3e", persist_directory=DEFAULT_PERSIST_PATH):
     if embeddings == 'openai' or embeddings == 'm3e' or embeddings =='zhipuai':
         vectordb = create_db(files, persist_directory, embeddings)
     return ""
 
 
-def create_db(files=DEFAULT_DB_PATH, persist_directory=DEFAULT_PERSIST_PATH, embeddings="openai"):
+def create_db(files=DEFAULT_DB_PATH, persist_directory=DEFAULT_PERSIST_PATH, embeddings="m3e"):
     """
     This function loads files, splits documents, generates document embeddings, 
     and creates a vector database.
@@ -122,4 +122,4 @@ def load_knowledge_db(path, embeddings):
 
 
 if __name__ == "__main__":
-    create_db(embeddings="openai")
+    create_db(embeddings="m3e")

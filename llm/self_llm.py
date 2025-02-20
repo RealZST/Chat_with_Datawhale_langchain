@@ -15,33 +15,44 @@ from typing import Dict, Any, Mapping
 from pydantic import Field
 
 class Self_LLM(LLM):
-    # 自定义 LLM
-    # 继承自 langchain.llms.base.LLM
-    # 原生接口地址
+    '''
+    Custom LLM adapter class for standardizing API calls across different LLMs.
+    Inherits from langchain.llms.base.LLM to maintain LangChain compatibility.
+    '''
+
+    # Native API endpoint
     url : str =  None
-    # 默认选用 GPT-3.5 模型，即目前一般所说的GPT
+    # Default model
     model_name: str = "gpt-3.5-turbo"
-    # 访问时延上限
+    # Request timeout limit
     request_timeout: float = None
-    # 温度系数
+    # Temperature coefficient
     temperature: float = 0.1
     # API_Key
     api_key: str = None
-    # 必备的可选参数
+    # Optional parameters
     model_kwargs: Dict[str, Any] = Field(default_factory=dict)
 
-    # 定义一个返回默认参数的方法
+
     @property
     def _default_params(self) -> Dict[str, Any]:
-        """获取调用默认参数。"""
+        '''
+        Defines a method that returns the default parameters
+        '''
         normal_params = {
             "temperature": self.temperature,
             "request_timeout": self.request_timeout,
             }
-        # print(type(self.model_kwargs))
         return {**normal_params}
     
     @property
     def _identifying_params(self) -> Mapping[str, Any]:
-        """Get the identifying parameters."""
+        '''
+        Get the identifying parameters
+        '''
         return {**{"model_name": self.model_name}, **self._default_params}
+
+    # Example:
+    # llm = Self_LLM(model_name="gpt-4", temperature=0.7)
+    # print(llm._identifying_params)
+    # Output: {'model_name': 'gpt-4', 'temperature': 0.7, 'request_timeout': None}

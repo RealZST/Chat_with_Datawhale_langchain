@@ -10,6 +10,12 @@
 @Desc    :   基于智谱 AI 大模型自定义 LLM 类
 '''
 
+'''
+Inherits the Self_LLM class in self_llm.py and wraps the Zhipuai API, 
+making it convenient for model_to_llm.py to call this LLM.
+'''
+
+
 from __future__ import annotations
 
 import logging
