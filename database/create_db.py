@@ -1,5 +1,5 @@
 '''
-Used for index construction (Document loading → Splitting → Vectorization → Storing in database)
+Used for index construction (Document loading → Splitting → Embedding → Storing in vector database)
 '''
 
 import os
@@ -50,13 +50,21 @@ def file_loader(file, loaders):
     return
 
 
-def create_db_info(files=DEFAULT_DB_PATH, embeddings="m3e", persist_directory=DEFAULT_PERSIST_PATH):
-    if embeddings == 'openai' or embeddings == 'm3e' or embeddings =='zhipuai':
-        vectordb = create_db(files, persist_directory, embeddings)
+# def create_db_info(files=DEFAULT_DB_PATH, embeddings="m3e", persist_directory=DEFAULT_PERSIST_PATH):
+
+    
+#     if embeddings == 'openai' or embeddings == 'm3e' or embeddings =='zhipuai':
+#         vectordb = create_db(files, persist_directory, embeddings)
+#     return ""
+
+def create_db_info(files=DEFAULT_DB_PATH, persist_directory=DEFAULT_PERSIST_PATH, embeddings="m3e"):
+    
+    merge = os.path.exists(persist_directory) and bool(os.listdir(persist_directory))    
+    vectordb = create_db(files, persist_directory, embeddings, merge)
+
     return ""
 
-
-def create_db(files=DEFAULT_DB_PATH, persist_directory=DEFAULT_PERSIST_PATH, embeddings="m3e"):
+def create_db(files=DEFAULT_DB_PATH, persist_directory=DEFAULT_PERSIST_PATH, embeddings="m3e", merge=False):
     """
     This function loads files, splits documents, generates document embeddings, 
     and creates a vector database.
@@ -68,6 +76,7 @@ def create_db(files=DEFAULT_DB_PATH, persist_directory=DEFAULT_PERSIST_PATH, emb
     Return:
         vectordb: The created vector database.
     """
+
     if files == None:
         return "can't load empty file"
     if type(files) != list:
@@ -89,12 +98,17 @@ def create_db(files=DEFAULT_DB_PATH, persist_directory=DEFAULT_PERSIST_PATH, emb
     if type(embeddings) == str:
         embeddings = get_embedding(embedding=embeddings)
     
-    # Create a vector database and store vectors
-    vectordb = Chroma.from_documents(
-        documents=split_docs,
-        embedding=embeddings,
-        persist_directory=persist_directory
-    ) 
+    if merge:
+        vectordb = load_knowledge_db(persist_directory, embeddings)
+        # Add new documents (this merges data)
+        vectordb.add_documents(split_docs)
+    else:
+        # Create a vector database and store vectors
+        vectordb = Chroma.from_documents(
+            documents=split_docs,
+            embedding=embeddings,
+            persist_directory=persist_directory
+        ) 
 
     # Persist the vector database to ensure it remains available after a restart 
     # without needing to be rebuilt, suitable for ChromaDB.
