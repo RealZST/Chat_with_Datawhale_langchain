@@ -208,7 +208,7 @@ with block as demo:
             file = gr.File(label='Select Knowledge Base Directory', file_count='directory',
                            file_types=['.txt', '.md', '.docx', '.pdf'])
             with gr.Row():
-                init_db = gr.Button("Vectorize Knowledge Base")
+                init_db = gr.Button("Embedding Your Knowledge Base")
             
             model_argument = gr.Accordion("Parameter Configuration", open=False)
             with model_argument:
@@ -244,16 +244,18 @@ with block as demo:
                 embeddings = gr.Dropdown(EMBEDDING_MODEL_LIST,
                                          label="Embedding model",
                                          value=INIT_EMBEDDING_MODEL)
+                
+                persist_path_input = gr.Textbox(value=DEFAULT_PERSIST_PATH, label="VectorDB Path")
 
         # Set up the click event for the knowledge base initialization button. 
         # When clicked, it calls `create_db_info()`, passing in the uploaded file and the selected embedding model.
         init_db.click(create_db_info,
-                      inputs=[file, embeddings], outputs=[msg])
+                      inputs=[file, persist_path_input, embeddings], outputs=[msg])
 
         # Set up button click events. When clicked, it calls `chat_qa_chain_self_answer()`, 
         # passing in the user's query and chat history, then updates the UI components.
         db_with_his_btn.click(model_center.chat_qa_chain_self_answer, inputs=[
-                              msg, chatbot,  llm, embeddings, temperature, top_k, history_len],
+                              msg, chatbot, llm, embeddings, temperature, top_k, history_len],
                               outputs=[msg, chatbot])
         
         # Set up button click events. When clicked, it calls `qa_chain_self_answer()`, 
