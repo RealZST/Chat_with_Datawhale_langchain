@@ -49,14 +49,6 @@ def file_loader(file, loaders):
         loaders.append(UnstructuredFileLoader(file))
     return
 
-
-# def create_db_info(files=DEFAULT_DB_PATH, embeddings="m3e", persist_directory=DEFAULT_PERSIST_PATH):
-
-    
-#     if embeddings == 'openai' or embeddings == 'm3e' or embeddings =='zhipuai':
-#         vectordb = create_db(files, persist_directory, embeddings)
-#     return ""
-
 def create_db_info(files=DEFAULT_DB_PATH, persist_directory=DEFAULT_PERSIST_PATH, embeddings="m3e"):
     
     merge = os.path.exists(persist_directory) and bool(os.listdir(persist_directory))    

@@ -5,29 +5,27 @@ from embedding.call_embedding import get_embedding
 
 def get_vectordb(file_path:str=None, persist_path:str=None, embedding = "m3e", embedding_key:str=None):
     """
-    用于创建或加载一个向量数据库，并返回 一个可以用于检索的向量数据库对象。
+    Creates or loads a vector database and returns a vector database object that can be used for retrieval.
     
     Args:
-        file_path: 知识库文件的路径(仅在新建向量数据库时需要)
-        persist_path: 向量数据库的持久化存储路径
-        embedding: 选择的 embedding 模型
-        embedding_key: API Key，用于访问 embedding 模型
+        file_path: Path to the knowledge base files (only needed when creating a new vector database)
+        persist_path: Path for persistent storage of the vector database
+        embedding: Selected embedding model
+        embedding_key: API Key used to access the embedding model
 
     Return:
-        vectordb: 向量数据库
+        vectordb: Vector database
     """
     embedding = get_embedding(embedding=embedding, embedding_key=embedding_key)  # Get embedding model
     
-    if os.path.exists(persist_path):  #持久化目录存在
+    if os.path.exists(persist_path):  # Check if the persistence directory exists
         contents = os.listdir(persist_path)
-        if len(contents) == 0:  #但是下面为空
-            #print("目录为空")
+        if len(contents) == 0:  # If the directory exists but is empty
             vectordb = create_db(file_path, persist_path, embedding, merge=False)
             vectordb = load_knowledge_db(persist_path, embedding)
         else:
-            #print("目录不为空")
             vectordb = load_knowledge_db(persist_path, embedding)
-    else: #目录不存在，从头开始创建向量数据库
+    else:  # If the directory does not exist, create a new vector database from scratch
         vectordb = create_db(file_path, persist_path, embedding, merge=False)
         vectordb = load_knowledge_db(persist_path, embedding)
 
