@@ -1,4 +1,4 @@
-# Reproduction for Personal Knowledge Base Assistant
+# Reproduction for Personal Knowledge Base Assistant (RAG)
 
 ## **Environment Setup**
 
@@ -102,3 +102,21 @@ Chat_with_Datawhale_langchain/
     │   ├──── QA_chain_self.py  # A retrieval-augmented QA chain without conversation history
     │   ├──── Chat_QA_chain_self.py  # A retrieval-augmented conversational QA chain with history
 ```
+
+<p align="center">
+  <img src="figures/project.png" width="80%">
+</p>
+
+---
+
+## **Modifications & Enhancements**
+
+
+This project includes several modifications and improvements based on [the original repository](https://github.com/logan-zou/Chat_with_Datawhale_langchain):
+
+- **Refined Environment Setup**: Additional configurations and corrections were made.
+- **Added 'Project Structure'**: Added an overview of all scripts and their relationships.
+- **Code Organization & Documentation**: Cleaned up unnecessary codes and added detailed comments.
+- **New Features**:
+  1. If a vector database already exists in the specified persist path, newly uploaded files will be vectorized and **merged** with the existing vector database. (In the original project, the existing vector database would be replaced.)
+  2. The UI now allows users to **view and modify the persist path** for storing the vector database.
