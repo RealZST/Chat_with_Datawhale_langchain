@@ -1,5 +1,20 @@
 # Reproduction for Personal Knowledge Base Assistant (RAG)
 
+
+## **Modifications & Enhancements**
+
+
+This project includes several modifications and improvements based on [the original repository](https://github.com/logan-zou/Chat_with_Datawhale_langchain):
+
+- **Refined Environment Setup**: Additional configurations and corrections were made.
+- **Added 'Project Structure'**: Added an overview of all scripts and their relationships.
+- **Code Organization & Documentation**: Cleaned up unnecessary codes and added detailed comments.
+- **New Features**:
+  1. If a vector database already exists in the specified persist path, newly uploaded files will be vectorized and **merged** with the existing vector database. (In the original project, the existing vector database would be replaced.)
+  2. The UI now allows users to view and modify the persist path for storing the vector database.
+
+---
+
 ## **Environment Setup**
 
 **1️⃣ Create and activate the Conda environment**
@@ -107,16 +122,3 @@ Chat_with_Datawhale_langchain/
   <img src="figures/project.png" width="80%">
 </p>
 
----
-
-## **Modifications & Enhancements**
-
-
-This project includes several modifications and improvements based on [the original repository](https://github.com/logan-zou/Chat_with_Datawhale_langchain):
-
-- **Refined Environment Setup**: Additional configurations and corrections were made.
-- **Added 'Project Structure'**: Added an overview of all scripts and their relationships.
-- **Code Organization & Documentation**: Cleaned up unnecessary codes and added detailed comments.
-- **New Features**:
-  1. If a vector database already exists in the specified persist path, newly uploaded files will be vectorized and **merged** with the existing vector database. (In the original project, the existing vector database would be replaced.)
-  2. The UI now allows users to view and modify the persist path for storing the vector database.
