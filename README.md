@@ -119,4 +119,4 @@ This project includes several modifications and improvements based on [the origi
 - **Code Organization & Documentation**: Cleaned up unnecessary codes and added detailed comments.
 - **New Features**:
   1. If a vector database already exists in the specified persist path, newly uploaded files will be vectorized and **merged** with the existing vector database. (In the original project, the existing vector database would be replaced.)
-  2. The UI now allows users to **view and modify the persist path** for storing the vector database.
+  2. The UI now allows users to view and modify the persist path for storing the vector database.
