@@ -1,6 +1,6 @@
 import sys 
 import os
-from database.create_db import create_db, load_knowledge_db
+from database.create_db import create_db, load_db
 from embedding.call_embedding import get_embedding
 
 def get_vectordb(file_path:str=None, persist_path:str=None, embedding = "m3e", embedding_key:str=None):
@@ -22,11 +22,9 @@ def get_vectordb(file_path:str=None, persist_path:str=None, embedding = "m3e", e
         contents = os.listdir(persist_path)
         if len(contents) == 0:  # If the directory exists but is empty
             vectordb = create_db(file_path, persist_path, embedding, merge=False)
-            vectordb = load_knowledge_db(persist_path, embedding)
         else:
-            vectordb = load_knowledge_db(persist_path, embedding)
+            vectordb = load_db(persist_path, embedding)
     else:  # If the directory does not exist, create a new vector database from scratch
         vectordb = create_db(file_path, persist_path, embedding, merge=False)
-        vectordb = load_knowledge_db(persist_path, embedding)
 
     return vectordb

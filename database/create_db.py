@@ -91,7 +91,7 @@ def create_db(files=DEFAULT_DB_PATH, persist_directory=DEFAULT_PERSIST_PATH, emb
         embeddings = get_embedding(embedding=embeddings)
     
     if merge:
-        vectordb = load_knowledge_db(persist_directory, embeddings)
+        vectordb = load_db(persist_directory, embeddings)
         # Add new documents (this merges data)
         vectordb.add_documents(split_docs)
     else:
@@ -108,7 +108,7 @@ def create_db(files=DEFAULT_DB_PATH, persist_directory=DEFAULT_PERSIST_PATH, emb
     
     return vectordb
 
-def load_knowledge_db(path, embeddings):
+def load_db(path, embeddings):
     """
     This function loads an existing vector database.
 
