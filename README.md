@@ -119,6 +119,6 @@ Chat_with_Datawhale_langchain/
 ```
 
 <p align="center">
-  <img src="figures/project.png" width="80%">
+  <img src="figures/project.png" width="100%">
 </p>
 
